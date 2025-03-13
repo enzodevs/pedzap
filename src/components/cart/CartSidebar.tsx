@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { X, ShoppingCart, ArrowRight } from 'lucide-react';
+import { X, ShoppingBag, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '@/context/CartContext';
 import CartItem from './CartItem';
@@ -36,9 +36,9 @@ const CartSidebar: React.FC = () => {
           {/* Header */}
           <div className="flex justify-between items-center p-4 border-b">
             <div className="flex items-center">
-              <ShoppingCart className="h-5 w-5 text-ifacens-primary mr-2" />
+              <ShoppingBag className="h-5 w-5 text-ifacens-primary mr-2" />
               <h2 className="text-lg font-semibold">
-                Seu Carrinho
+                Seu Pedido
                 {totalItems > 0 && (
                   <span className="ml-2 text-sm font-normal text-gray-500">
                     ({totalItems} {totalItems === 1 ? 'item' : 'itens'})
@@ -59,7 +59,7 @@ const CartSidebar: React.FC = () => {
           <div className="flex-1 overflow-y-auto p-4">
             {items.length === 0 ? (
               <div className="h-full flex flex-col items-center justify-center text-center">
-                <ShoppingCart className="h-12 w-12 text-gray-300 mb-4" />
+                <ShoppingBag className="h-12 w-12 text-gray-300 mb-4" />
                 <p className="text-gray-500 mb-2">Seu carrinho está vazio</p>
                 <p className="text-sm text-gray-400">
                   Adicione alguns itens para continuar

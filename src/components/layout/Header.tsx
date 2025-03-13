@@ -1,7 +1,6 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Menu, X, ShoppingCart } from 'lucide-react';
+import { Menu, X, ShoppingBag } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCart } from '@/context/CartContext';
 
@@ -10,7 +9,6 @@ const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const { totalItems, toggleCart } = useCart();
 
-  // Track scroll position to change header style
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
@@ -36,7 +34,6 @@ const Header = () => {
       )}
     >
       <div className="container mx-auto px-4 flex justify-between items-center">
-        {/* Logo */}
         <Link 
           to="/" 
           className="relative flex items-center"
@@ -49,7 +46,6 @@ const Header = () => {
           />
         </Link>
 
-        {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-6">
           <Link 
             to="/" 
@@ -68,7 +64,7 @@ const Header = () => {
             className="relative text-gray-700 hover:text-ifacens-primary transition-colors"
             aria-label="Carrinho de compras"
           >
-            <ShoppingCart className="h-5 w-5" />
+            <ShoppingBag className="h-5 w-5" />
             {totalItems > 0 && (
               <span className="absolute -top-2 -right-2 bg-ifacens-primary text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
                 {totalItems}
@@ -77,14 +73,13 @@ const Header = () => {
           </button>
         </nav>
 
-        {/* Mobile Navigation Button */}
         <div className="flex items-center space-x-4 md:hidden">
           <button
             onClick={toggleCart}
             className="relative text-gray-700 p-1"
             aria-label="Carrinho de compras"
           >
-            <ShoppingCart className="h-5 w-5" />
+            <ShoppingBag className="h-5 w-5" />
             {totalItems > 0 && (
               <span className="absolute -top-2 -right-2 bg-ifacens-primary text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
                 {totalItems}
@@ -101,7 +96,6 @@ const Header = () => {
         </div>
       </div>
 
-      {/* Mobile Menu */}
       <div 
         className={cn(
           "fixed inset-0 bg-white z-40 pt-20 px-4 transition-all duration-300 transform md:hidden",

@@ -1,6 +1,4 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { toast } from 'sonner';
 
 // Type definitions
 export interface Product {
@@ -94,13 +92,12 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (items.length > 0 && currentStandId && product.standId !== currentStandId) {
       // Mostrar confirmação para o usuário sobre a troca de barraca
       if (window.confirm(
-        `Seu carrinho atual contém itens da barraca ${currentStandName}. Adicionar este item removerá os itens atuais do carrinho. Deseja continuar?`
+        `Você já tem itens da barraca "${currentStandName}" no seu carrinho. Adicionar este item da barraca "${product.standName}" removerá os itens atuais. Deseja continuar?`
       )) {
         // Limpar o carrinho e adicionar o novo item
         setItems([{ product, quantity }]);
         setCurrentStandId(product.standId);
         setCurrentStandName(product.standName);
-        toast.success(`Carrinho atualizado com item da barraca ${product.standName}`);
       }
       return;
     }
@@ -124,24 +121,20 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         
         // Verificar estoque
         if (newQuantity > stockAvailable) {
-          toast.error(`Quantidade excede o estoque disponível (${stockAvailable})`);
           return currentItems;
         }
         
         // Atualizar quantidade do item existente
         const updatedItems = [...currentItems];
         updatedItems[existingItemIndex].quantity = newQuantity;
-        toast.success(`${product.name} atualizado no carrinho`);
         return updatedItems;
       } else {
         // Verificar estoque para novos itens
         if (quantity > stockAvailable) {
-          toast.error(`Quantidade excede o estoque disponível (${stockAvailable})`);
           return currentItems;
         }
         
         // Adicionar novo item
-        toast.success(`${product.name} adicionado ao carrinho`);
         return [...currentItems, { product, quantity }];
       }
     });
@@ -155,7 +148,6 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setItems(currentItems => {
       const itemToRemove = currentItems.find(item => item.product.id === productId);
       if (itemToRemove) {
-        toast.info(`${itemToRemove.product.name} removido do carrinho`);
       }
       return currentItems.filter(item => item.product.id !== productId);
     });
@@ -179,7 +171,6 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         : Infinity;
         
       if (quantity > stockAvailable) {
-        toast.error(`Quantidade excede o estoque disponível (${stockAvailable})`);
         return currentItems;
       }
       
@@ -196,7 +187,6 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setItems([]);
     setCurrentStandId(null);
     setCurrentStandName(null);
-    toast.info('Carrinho esvaziado');
   };
 
   // Toggle cart visibility

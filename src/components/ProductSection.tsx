@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ProductCard from './ProductCard';
 import { Product } from '@/context/CartContext';
 
@@ -14,11 +14,21 @@ interface ProductSectionProps {
 }
 
 const ProductSection: React.FC<ProductSectionProps> = ({ stands, loading = false }) => {
+  // Filtrar stands vazias
+  const nonEmptyStands = stands.filter(stand => stand.products.length > 0);
+  
   const [activeStand, setActiveStand] = useState<string | null>(
-    stands.length > 0 ? stands[0].id : null
+    nonEmptyStands.length > 0 ? nonEmptyStands[0].id : null
   );
 
-  const activeStandData = stands.find(stand => stand.id === activeStand);
+  // Atualizar o activeStand se a lista de stands mudar
+  useEffect(() => {
+    if (nonEmptyStands.length > 0 && !nonEmptyStands.some(stand => stand.id === activeStand)) {
+      setActiveStand(nonEmptyStands[0].id);
+    }
+  }, [nonEmptyStands, activeStand]);
+
+  const activeStandData = nonEmptyStands.find(stand => stand.id === activeStand);
 
   if (loading) {
     return (
@@ -39,7 +49,7 @@ const ProductSection: React.FC<ProductSectionProps> = ({ stands, loading = false
     );
   }
 
-  if (stands.length === 0) {
+  if (nonEmptyStands.length === 0) {
     return (
       <section id="stands" className="py-16 bg-gray-50">
         <div className="container mx-auto px-4">
@@ -73,7 +83,7 @@ const ProductSection: React.FC<ProductSectionProps> = ({ stands, loading = false
         {/* Stands Navigation */}
         <div className="flex overflow-x-auto pb-4 mb-8 hide-scrollbar">
           <div className="flex space-x-2 mx-auto">
-            {stands.map(stand => (
+            {nonEmptyStands.map(stand => (
               <button
                 key={stand.id}
                 onClick={() => setActiveStand(stand.id)}

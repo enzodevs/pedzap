@@ -1,10 +1,10 @@
 
 import React, { useState } from 'react';
-import { Plus, Minus, ShoppingCart, AlertCircle } from 'lucide-react';
+import { Plus, Minus, ShoppingBag, AlertCircle } from 'lucide-react';
 import { useCart, Product } from '@/context/CartContext';
 import { formatCurrency } from '@/lib/pixUtils';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { toast } from 'sonner';
+import { useNavigate } from 'react-router-dom';
 
 interface ProductCardProps {
   product: Product;
@@ -14,15 +14,16 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const { addItem } = useCart();
   const [quantity, setQuantity] = useState(1);
   const [showOptions, setShowOptions] = useState(false);
+  const navigate = useNavigate();
 
-  const hasOptions = product.name.toLowerCase().includes('combo');
+  const needsCustomization = 
+    product.name.toLowerCase().includes('x-') || 
+    product.name.toLowerCase().includes('combo');
 
   const increaseQuantity = () => {
     const maxStock = product.stock || 100;
     if (quantity < maxStock) {
       setQuantity(prev => prev + 1);
-    } else {
-      toast.warning(`Limite de estoque atingido (${maxStock})`);
     }
   };
 
@@ -37,10 +38,15 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       return; // Não permite adicionar ao carrinho se não houver estoque
     }
     
+    if (needsCustomization) {
+      // Navegar para a página de detalhes do produto se for um item que precisa de customização
+      navigate(`/product/${product.id}`, { state: { product } });
+      return;
+    }
+    
     addItem(product, quantity);
     setQuantity(1);
     setShowOptions(false);
-    toast.success(`${product.name} adicionado ao carrinho`);
   };
 
   // Use a default image if none is provided
@@ -78,105 +84,43 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         <div className="flex justify-between items-center">
           <span className="text-xs text-gray-500">{product.standName}</span>
           
-          {hasOptions ? (
-            <Popover open={showOptions} onOpenChange={setShowOptions}>
-              <PopoverTrigger asChild>
-                <button 
-                  className={`${
-                    outOfStock 
-                      ? 'bg-gray-300 cursor-not-allowed' 
-                      : 'bg-ifacens-primary hover:bg-ifacens-primary/90'
-                  } text-white p-2 rounded-full transition-colors`}
-                  disabled={outOfStock}
-                >
-                  <ShoppingCart className="h-4 w-4" />
-                </button>
-              </PopoverTrigger>
-              <PopoverContent className="w-72 p-4" side="top">
-                <div className="space-y-4">
-                  <div className="text-sm font-medium">Escolha suas opções</div>
-                  <div className="space-y-2">
-                    {/* Aqui pode-se adicionar opções específicas para combos */}
-                    <div className="flex justify-between text-sm">
-                      <span>Bebida:</span>
-                      <select className="border rounded px-2 py-1 text-sm">
-                        <option>Coca-Cola</option>
-                        <option>Pepsi</option>
-                        <option>Guaraná</option>
-                      </select>
-                    </div>
-                    {product.name.toLowerCase().includes('x-tudo') && (
-                      <div className="flex justify-between text-sm">
-                        <span>Ponto da carne:</span>
-                        <select className="border rounded px-2 py-1 text-sm">
-                          <option>Ao ponto</option>
-                          <option>Bem passado</option>
-                          <option>Mal passado</option>
-                        </select>
-                      </div>
-                    )}
-                  </div>
-                  <div className="flex items-center justify-between pt-2 border-t">
-                    <div className="flex items-center space-x-2">
-                      <button
-                        onClick={decreaseQuantity}
-                        className="p-1 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
-                      >
-                        <Minus className="h-4 w-4" />
-                      </button>
-                      <span className="w-8 text-center">{quantity}</span>
-                      <button
-                        onClick={increaseQuantity}
-                        className="p-1 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
-                      >
-                        <Plus className="h-4 w-4" />
-                      </button>
-                    </div>
-                    <button
-                      onClick={handleAddToCart}
-                      className="bg-ifacens-primary text-white px-3 py-1 rounded-md text-sm"
-                    >
-                      Adicionar
-                    </button>
-                  </div>
-                </div>
-              </PopoverContent>
-            </Popover>
-          ) : (
-            <div className="flex items-center space-x-2">
-              <button
-                onClick={decreaseQuantity}
-                className="p-1 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
-                disabled={outOfStock || quantity <= 1}
-              >
-                <Minus className="h-3 w-3" />
-              </button>
-              <span className="w-6 text-center text-sm">{quantity}</span>
-              <button
-                onClick={increaseQuantity}
-                className="p-1 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
-                disabled={outOfStock}
-              >
-                <Plus className="h-3 w-3" />
-              </button>
-              <button 
-                onClick={handleAddToCart}
-                className={`${
-                  outOfStock 
-                    ? 'bg-gray-300 cursor-not-allowed' 
-                    : 'bg-ifacens-primary hover:bg-ifacens-primary/90'
-                } text-white p-2 rounded-full transition-colors`}
-                disabled={outOfStock}
-                aria-label={
-                  outOfStock 
-                    ? `${product.name} fora de estoque` 
-                    : `Adicionar ${product.name} ao carrinho`
-                }
-              >
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={decreaseQuantity}
+              className="p-1 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
+              disabled={outOfStock || quantity <= 1}
+            >
+              <Minus className="h-3 w-3" />
+            </button>
+            <span className="w-6 text-center text-sm">{quantity}</span>
+            <button
+              onClick={increaseQuantity}
+              className="p-1 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
+              disabled={outOfStock}
+            >
+              <Plus className="h-3 w-3" />
+            </button>
+            <button 
+              onClick={handleAddToCart}
+              className={`${
+                outOfStock 
+                  ? 'bg-gray-300 cursor-not-allowed' 
+                  : 'bg-ifacens-primary hover:bg-ifacens-primary/90'
+              } text-white p-2 rounded-full transition-colors`}
+              disabled={outOfStock}
+              aria-label={
+                outOfStock 
+                  ? `${product.name} fora de estoque` 
+                  : `Adicionar ${product.name} ao carrinho`
+              }
+            >
+              {needsCustomization ? (
+                <ShoppingBag className="h-4 w-4" />
+              ) : (
                 <Plus className="h-4 w-4" />
-              </button>
-            </div>
-          )}
+              )}
+            </button>
+          </div>
         </div>
       </div>
     </div>
