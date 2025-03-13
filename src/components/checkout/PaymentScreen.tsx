@@ -36,17 +36,32 @@ const PaymentScreen: React.FC<PaymentScreenProps> = ({ customerName }) => {
         // Format value for the API (e.g., "10.00")
         const formattedValue = formatValueForPix(totalPrice);
         
-        // Call the PIX API
-        const response = await fetch(
-          `https://gerarqrcodepix.com.br/api/v1?nome=iFacens&cidade=Sorocaba&saida=br&valor=${formattedValue}&txid=${newTxid}&chave=b1936613-2fa8-4307-a08d-8ddfd05b3c75`
-        );
+        // Define the API URL with all parameters
+        const apiUrl = `https://gerarqrcodepix.com.br/api/v1?nome=iFacens&cidade=Sorocaba&saida=br&valor=${formattedValue}&txid=${newTxid}&chave=b1936613-2fa8-4307-a08d-8ddfd05b3c75`;
+        
+        console.log("Calling PIX API with URL:", apiUrl);
+        
+        // Call the PIX API with proper headers to avoid CORS issues
+        const response = await fetch(apiUrl, {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+          },
+          mode: 'cors',
+        });
         
         if (!response.ok) {
-          throw new Error('Falha ao gerar o código PIX. Por favor, tente novamente.');
+          throw new Error(`Falha ao gerar o código PIX. Status: ${response.status}`);
         }
         
         const data = await response.json();
-        setBrcode(data.brcode);
+        console.log("PIX API response:", data);
+        
+        if (data && data.brcode) {
+          setBrcode(data.brcode);
+        } else {
+          throw new Error('Resposta da API PIX não contém o código esperado');
+        }
         
         // Salvar o pedido no Supabase
         if (currentStandId && items.length > 0) {
