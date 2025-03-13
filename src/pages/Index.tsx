@@ -5,7 +5,8 @@ import Footer from '@/components/layout/Footer';
 import Hero from '@/components/Hero';
 import ProductSection from '@/components/ProductSection';
 import CartSidebar from '@/components/cart/CartSidebar';
-import { getStands, getProductsByStand, Stand } from '@/services/supabaseService';
+import FloatingCartButton from '@/components/cart/FloatingCartButton';
+import { getStands, getProductsByStand } from '@/services/supabaseService';
 import { Product } from '@/context/CartContext';
 
 const Index = () => {
@@ -55,6 +56,7 @@ const Index = () => {
       <ProductSection stands={stands} loading={loading} />
       <Footer />
       <CartSidebar />
+      <FloatingCartButton />
     </div>
   );
 };

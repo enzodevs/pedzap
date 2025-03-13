@@ -1,10 +1,11 @@
 
 import React from 'react';
-import { X, ShoppingCart } from 'lucide-react';
+import { X, ShoppingCart, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '@/context/CartContext';
 import CartItem from './CartItem';
 import { formatCurrency } from '@/lib/pixUtils';
+import { Button } from '@/components/ui/button';
 
 const CartSidebar: React.FC = () => {
   const { items, isCartOpen, totalItems, totalPrice, closeCart, clearCart } = useCart();
@@ -90,12 +91,13 @@ const CartSidebar: React.FC = () => {
               </div>
 
               <div className="space-y-2">
-                <button
+                <Button
                   onClick={handleCheckout}
-                  className="w-full btn-primary"
+                  className="w-full bg-ifacens-primary hover:bg-ifacens-primary/90 text-white"
                 >
                   Finalizar Pedido
-                </button>
+                  <ArrowRight className="h-4 w-4 ml-2" />
+                </Button>
                 
                 <button
                   onClick={clearCart}
