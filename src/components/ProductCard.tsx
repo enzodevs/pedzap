@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import { Plus, Minus, ShoppingBag, AlertCircle } from 'lucide-react';
 import { useCart, Product } from '@/context/CartContext';
 import { formatCurrency } from '@/lib/pixUtils';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useNavigate } from 'react-router-dom';
 
 interface ProductCardProps {
@@ -11,9 +10,8 @@ interface ProductCardProps {
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
-  const { addItem } = useCart();
+  const { addItem, toggleCart } = useCart();
   const [quantity, setQuantity] = useState(1);
-  const [showOptions, setShowOptions] = useState(false);
   const navigate = useNavigate();
 
   const needsCustomization = 
@@ -46,7 +44,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     
     addItem(product, quantity);
     setQuantity(1);
-    setShowOptions(false);
+    toggleCart(); // Abrir o carrinho automaticamente após adicionar produto
   };
 
   // Use a default image if none is provided

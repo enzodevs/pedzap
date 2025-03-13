@@ -7,6 +7,7 @@ import Index from './pages/Index';
 import Payment from './pages/Payment';
 import ProductDetails from './pages/ProductDetails';
 import NotFound from './pages/NotFound';
+import ScrollToTop from './components/layout/ScrollToTop';
 import './App.css';
 
 // Create a client
@@ -17,6 +18,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <CartProvider>
         <Router>
+          <ScrollToTop />
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/payment" element={<Payment />} />

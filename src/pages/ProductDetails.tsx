@@ -109,13 +109,16 @@ const ProductDetails = () => {
     if (selectedOptions.size) optionsDescription.push(`Tamanho: ${selectedOptions.size}`);
     if (selectedOptions.extras.length > 0) optionsDescription.push(`Extras: ${selectedOptions.extras.join(', ')}`);
     
+    // Garantir que o preço unitário nunca seja zero
+    const unitPrice = totalPrice / quantity || product.price;
+    
     // Criar produto customizado
     const customProduct: Product = {
       ...product,
       description: optionsDescription.length > 0 
         ? `${product.description} (${optionsDescription.join(' | ')})` 
         : product.description,
-      price: totalPrice / quantity, // Preço unitário com os extras
+      price: unitPrice, // Preço unitário com os extras
     };
     
     // Adicionar ao carrinho

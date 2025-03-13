@@ -38,7 +38,9 @@ const Index = () => {
           })
         );
         
-        setStands(standsWithProducts);
+        // Filtrar apenas barracas com produtos
+        const nonEmptyStands = standsWithProducts.filter(stand => stand.products.length > 0);
+        setStands(nonEmptyStands);
       } catch (error) {
         console.error('Erro ao buscar dados:', error);
       } finally {

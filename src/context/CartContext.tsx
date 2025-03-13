@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 // Type definitions
@@ -92,12 +93,13 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (items.length > 0 && currentStandId && product.standId !== currentStandId) {
       // Mostrar confirmação para o usuário sobre a troca de barraca
       if (window.confirm(
-        `Você já tem itens da barraca "${currentStandName}" no seu carrinho. Adicionar este item da barraca "${product.standName}" removerá os itens atuais. Deseja continuar?`
+        `Você já tem itens da barraca "${currentStandName}" na sua sacola.\n\nAdicionar este item da barraca "${product.standName}" substituirá todos os itens atuais.\n\nDeseja continuar?`
       )) {
         // Limpar o carrinho e adicionar o novo item
         setItems([{ product, quantity }]);
         setCurrentStandId(product.standId);
         setCurrentStandName(product.standName);
+        setIsCartOpen(true);
       }
       return;
     }
