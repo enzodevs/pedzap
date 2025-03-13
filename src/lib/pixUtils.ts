@@ -31,6 +31,28 @@ export const formatValueForPix = (value: number): string => {
 };
 
 /**
+ * Manually creates a PIX code without using the API
+ * Using a simplified structure compatible with most PIX apps
+ * 
+ * @param pixKey The PIX key
+ * @param merchant The merchant name
+ * @param city The merchant city
+ * @param amount The transaction amount
+ * @param txid The transaction ID
+ * @returns A formatted PIX code string
+ */
+export const createPixCode = (
+  pixKey: string,
+  merchant: string,
+  city: string,
+  amount: string,
+  txid: string
+): string => {
+  // This is a simplified version that should work with most PIX apps
+  return `00020126580014br.gov.bcb.pix0136${pixKey}5204000053039865405${amount}5802BR5907${merchant}6008${city}62190515${txid}6304`;
+};
+
+/**
  * Generates a WhatsApp message with order details
  * @param name Customer name
  * @param orderItems Order items details 

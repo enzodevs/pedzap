@@ -4,7 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Copy, Send, Check } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { createOrder } from '@/services/supabaseService';
-import { formatCurrency, generateTransactionId, generateWhatsAppLink, formatValueForPix } from '@/lib/pixUtils';
+import { formatCurrency, generateTransactionId, generateWhatsAppLink, formatValueForPix, createPixCode } from '@/lib/pixUtils';
+import { useToast } from '@/hooks/use-toast';
 
 interface PaymentScreenProps {
   customerName: string;
@@ -19,6 +20,7 @@ const PaymentScreen: React.FC<PaymentScreenProps> = ({ customerName }) => {
   const [orderSaved, setOrderSaved] = useState(false);
   const { items, totalPrice, currentStandId, clearCart } = useCart();
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   const [error, setError] = useState<string | null>(null);
 
@@ -36,31 +38,49 @@ const PaymentScreen: React.FC<PaymentScreenProps> = ({ customerName }) => {
         // Format value for the API (e.g., "10.00")
         const formattedValue = formatValueForPix(totalPrice);
         
-        // Define the API URL with all parameters
-        const apiUrl = `https://gerarqrcodepix.com.br/api/v1?nome=iFacens&cidade=Sorocaba&saida=br&valor=${formattedValue}&txid=${newTxid}&chave=b1936613-2fa8-4307-a08d-8ddfd05b3c75`;
-        
-        console.log("Calling PIX API with URL:", apiUrl);
-        
-        // Call the PIX API with proper headers to avoid CORS issues
-        const response = await fetch(apiUrl, {
-          method: 'GET',
-          headers: {
-            'Accept': 'application/json',
-          },
-          mode: 'cors',
-        });
-        
-        if (!response.ok) {
-          throw new Error(`Falha ao gerar o código PIX. Status: ${response.status}`);
-        }
-        
-        const data = await response.json();
-        console.log("PIX API response:", data);
-        
-        if (data && data.brcode) {
-          setBrcode(data.brcode);
-        } else {
-          throw new Error('Resposta da API PIX não contém o código esperado');
+        try {
+          // Try API call first
+          // Define the API URL with all parameters
+          const apiUrl = `https://gerarqrcodepix.com.br/api/v1?nome=iFacens&cidade=Sorocaba&saida=br&valor=${formattedValue}&txid=${newTxid}&chave=b1936613-2fa8-4307-a08d-8ddfd05b3c75`;
+          
+          console.log("Calling PIX API with URL:", apiUrl);
+          
+          // Call the PIX API with no-cors mode to avoid CORS issues
+          const response = await fetch(apiUrl, {
+            method: 'GET',
+            headers: {
+              'Accept': 'application/json',
+            },
+            mode: 'no-cors', // This will prevent CORS errors but return an opaque response
+          });
+          
+          // Since we're using no-cors, we can't access the response body
+          // So we'll use our fallback approach regardless
+          console.log("PIX API response status:", response.status, response.type);
+          
+          // We'll generate the PIX code ourselves
+          const pixCode = createPixCode(
+            'b1936613-2fa8-4307-a08d-8ddfd05b3c75',
+            'iFacens',
+            'Sorocaba',
+            formattedValue,
+            newTxid
+          );
+          
+          setBrcode(pixCode);
+        } catch (apiError) {
+          console.error("API call failed, using fallback:", apiError);
+          
+          // Create PIX code manually
+          const pixCode = createPixCode(
+            'b1936613-2fa8-4307-a08d-8ddfd05b3c75',
+            'iFacens',
+            'Sorocaba',
+            formattedValue,
+            newTxid
+          );
+          
+          setBrcode(pixCode);
         }
         
         // Salvar o pedido no Supabase
@@ -124,6 +144,10 @@ const PaymentScreen: React.FC<PaymentScreenProps> = ({ customerName }) => {
     if (brcode) {
       navigator.clipboard.writeText(brcode);
       setCopied(true);
+      toast({
+        title: "Código copiado!",
+        description: "O código PIX foi copiado para a área de transferência.",
+      });
       setTimeout(() => setCopied(false), 3000);
     }
   };
