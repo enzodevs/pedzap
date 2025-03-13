@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Copy, Send, Check } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
+import { createOrder } from '@/services/supabaseService';
 import { formatCurrency, generateTransactionId, generateWhatsAppLink, formatValueForPix } from '@/lib/pixUtils';
 
 interface PaymentScreenProps {
@@ -13,8 +14,10 @@ const PaymentScreen: React.FC<PaymentScreenProps> = ({ customerName }) => {
   const [brcode, setBrcode] = useState<string | null>(null);
   const [txid, setTxid] = useState<string>('');
   const [loading, setLoading] = useState(true);
+  const [savingOrder, setSavingOrder] = useState(false);
   const [copied, setCopied] = useState(false);
-  const { items, totalPrice, clearCart } = useCart();
+  const [orderSaved, setOrderSaved] = useState(false);
+  const { items, totalPrice, currentStandId, clearCart } = useCart();
   const navigate = useNavigate();
 
   const [error, setError] = useState<string | null>(null);
@@ -44,6 +47,33 @@ const PaymentScreen: React.FC<PaymentScreenProps> = ({ customerName }) => {
         
         const data = await response.json();
         setBrcode(data.brcode);
+        
+        // Salvar o pedido no Supabase
+        if (currentStandId && items.length > 0) {
+          setSavingOrder(true);
+          const orderItems = items.map(item => ({
+            productId: item.product.id,
+            quantity: item.quantity,
+            unitPrice: item.product.price
+          }));
+          
+          const result = await createOrder(
+            customerName,
+            newTxid,
+            currentStandId,
+            orderItems,
+            totalPrice
+          );
+          
+          setSavingOrder(false);
+          
+          if (result.success) {
+            setOrderSaved(true);
+          } else {
+            console.error('Erro ao salvar pedido:', result.error);
+            // Não exibimos erro para o usuário neste caso, permitimos continuar com o pagamento
+          }
+        }
       } catch (error) {
         console.error('Error generating PIX code:', error);
         setError('Houve um erro ao gerar o código PIX. Por favor, tente novamente.');
@@ -53,13 +83,13 @@ const PaymentScreen: React.FC<PaymentScreenProps> = ({ customerName }) => {
     };
 
     // Only generate PIX if we have items and a positive total price
-    if (items.length > 0 && totalPrice > 0) {
+    if (items.length > 0 && totalPrice > 0 && currentStandId) {
       generatePix();
     } else {
       setError('Seu carrinho está vazio ou há um problema com o valor total.');
       setLoading(false);
     }
-  }, [items, totalPrice]);
+  }, [items, totalPrice, currentStandId, customerName]);
 
   // Generate WhatsApp link with order information
   const whatsappLink = items.length > 0 && txid 
@@ -101,10 +131,10 @@ const PaymentScreen: React.FC<PaymentScreenProps> = ({ customerName }) => {
       <div className="bg-white rounded-lg shadow-md p-6">
         <h1 className="text-2xl font-semibold mb-6 text-center">Pagamento</h1>
         
-        {loading ? (
+        {loading || savingOrder ? (
           <div className="text-center py-8">
             <div className="animate-spin h-8 w-8 border-4 border-ifacens-primary/20 border-t-ifacens-primary rounded-full mx-auto mb-4"></div>
-            <p>Gerando código PIX...</p>
+            <p>{savingOrder ? 'Registrando seu pedido...' : 'Gerando código PIX...'}</p>
           </div>
         ) : error ? (
           <div className="text-center py-8">

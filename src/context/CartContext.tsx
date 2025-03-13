@@ -11,6 +11,7 @@ export interface Product {
   standId: string;
   standName: string;
   image?: string;
+  stock?: number;
 }
 
 interface CartItem {
@@ -23,6 +24,8 @@ interface CartContextType {
   isCartOpen: boolean;
   totalItems: number;
   totalPrice: number;
+  currentStandId: string | null;
+  currentStandName: string | null;
   addItem: (product: Product, quantity?: number) => void;
   removeItem: (productId: string) => void;
   updateQuantity: (productId: string, quantity: number) => void;
@@ -47,6 +50,8 @@ export const useCart = () => {
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [items, setItems] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [currentStandId, setCurrentStandId] = useState<string | null>(null);
+  const [currentStandName, setCurrentStandName] = useState<string | null>(null);
   
   // Calculate total items and price
   const totalItems = items.reduce((total, item) => total + item.quantity, 0);
@@ -57,9 +62,16 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const savedCart = localStorage.getItem('ifacens-cart');
     if (savedCart) {
       try {
-        setItems(JSON.parse(savedCart));
+        const parsedCart = JSON.parse(savedCart);
+        setItems(parsedCart);
+        
+        // Restaurar informações da barraca atual se houver itens no carrinho
+        if (parsedCart.length > 0) {
+          setCurrentStandId(parsedCart[0].product.standId);
+          setCurrentStandName(parsedCart[0].product.standName);
+        }
       } catch (error) {
-        console.error('Failed to parse cart data:', error);
+        console.error('Falha ao analisar dados do carrinho:', error);
         localStorage.removeItem('ifacens-cart');
       }
     }
@@ -71,29 +83,70 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       localStorage.setItem('ifacens-cart', JSON.stringify(items));
     } else {
       localStorage.removeItem('ifacens-cart');
+      setCurrentStandId(null);
+      setCurrentStandName(null);
     }
   }, [items]);
 
   // Add item to cart
   const addItem = (product: Product, quantity = 1) => {
+    // Verificar se já existe um produto de outra barraca no carrinho
+    if (items.length > 0 && currentStandId && product.standId !== currentStandId) {
+      // Mostrar confirmação para o usuário sobre a troca de barraca
+      if (window.confirm(
+        `Seu carrinho atual contém itens da barraca ${currentStandName}. Adicionar este item removerá os itens atuais do carrinho. Deseja continuar?`
+      )) {
+        // Limpar o carrinho e adicionar o novo item
+        setItems([{ product, quantity }]);
+        setCurrentStandId(product.standId);
+        setCurrentStandName(product.standName);
+        toast.success(`Carrinho atualizado com item da barraca ${product.standName}`);
+      }
+      return;
+    }
+
+    // Se o carrinho estiver vazio, definir a barraca atual
+    if (items.length === 0) {
+      setCurrentStandId(product.standId);
+      setCurrentStandName(product.standName);
+    }
+
+    // Verificar estoque disponível
+    const stockAvailable = product.stock !== undefined ? product.stock : Infinity;
+    
     setItems(currentItems => {
-      // Check if product already exists in cart
+      // Verificar se o produto já existe no carrinho
       const existingItemIndex = currentItems.findIndex(item => item.product.id === product.id);
       
       if (existingItemIndex > -1) {
-        // Update quantity of existing item
+        // Calcular nova quantidade
+        const newQuantity = currentItems[existingItemIndex].quantity + quantity;
+        
+        // Verificar estoque
+        if (newQuantity > stockAvailable) {
+          toast.error(`Quantidade excede o estoque disponível (${stockAvailable})`);
+          return currentItems;
+        }
+        
+        // Atualizar quantidade do item existente
         const updatedItems = [...currentItems];
-        updatedItems[existingItemIndex].quantity += quantity;
+        updatedItems[existingItemIndex].quantity = newQuantity;
         toast.success(`${product.name} atualizado no carrinho`);
         return updatedItems;
       } else {
-        // Add new item
+        // Verificar estoque para novos itens
+        if (quantity > stockAvailable) {
+          toast.error(`Quantidade excede o estoque disponível (${stockAvailable})`);
+          return currentItems;
+        }
+        
+        // Adicionar novo item
         toast.success(`${product.name} adicionado ao carrinho`);
         return [...currentItems, { product, quantity }];
       }
     });
 
-    // Open cart when adding items
+    // Abrir carrinho ao adicionar itens
     setIsCartOpen(true);
   };
 
@@ -115,18 +168,34 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return;
     }
 
-    setItems(currentItems => 
-      currentItems.map(item => 
+    setItems(currentItems => {
+      const itemIndex = currentItems.findIndex(item => item.product.id === productId);
+      
+      if (itemIndex === -1) return currentItems;
+      
+      // Verificar estoque disponível
+      const stockAvailable = currentItems[itemIndex].product.stock !== undefined 
+        ? currentItems[itemIndex].product.stock 
+        : Infinity;
+        
+      if (quantity > stockAvailable) {
+        toast.error(`Quantidade excede o estoque disponível (${stockAvailable})`);
+        return currentItems;
+      }
+      
+      return currentItems.map(item => 
         item.product.id === productId 
           ? { ...item, quantity } 
           : item
-      )
-    );
+      );
+    });
   };
 
   // Clear cart
   const clearCart = () => {
     setItems([]);
+    setCurrentStandId(null);
+    setCurrentStandName(null);
     toast.info('Carrinho esvaziado');
   };
 
@@ -146,6 +215,8 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     isCartOpen,
     totalItems,
     totalPrice,
+    currentStandId,
+    currentStandName,
     addItem,
     removeItem,
     updateQuantity,
