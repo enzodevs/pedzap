@@ -38,14 +38,13 @@ const PaymentScreen: React.FC<PaymentScreenProps> = ({ customerName }) => {
         // Format value for the API (e.g., "10.00")
         const formattedValue = formatValueForPix(totalPrice);
         
+        // Define the API URL with all parameters
+        const apiUrl = `https://gerarqrcodepix.com.br/api/v1?nome=iFacens&cidade=Sorocaba&saida=br&valor=${formattedValue}&txid=${newTxid}&chave=b1936613-2fa8-4307-a08d-8ddfd05b3c75`;
+        
+        console.log("Calling PIX API with URL:", apiUrl);
+        
         try {
-          // Try API call first
-          // Define the API URL with all parameters
-          const apiUrl = `https://gerarqrcodepix.com.br/api/v1?nome=iFacens&cidade=Sorocaba&saida=br&valor=${formattedValue}&txid=${newTxid}&chave=b1936613-2fa8-4307-a08d-8ddfd05b3c75`;
-          
-          console.log("Calling PIX API with URL:", apiUrl);
-          
-          // Call the PIX API with no-cors mode to avoid CORS issues
+          // Try API call with no-cors mode
           const response = await fetch(apiUrl, {
             method: 'GET',
             headers: {
@@ -54,11 +53,10 @@ const PaymentScreen: React.FC<PaymentScreenProps> = ({ customerName }) => {
             mode: 'no-cors', // This will prevent CORS errors but return an opaque response
           });
           
-          // Since we're using no-cors, we can't access the response body
-          // So we'll use our fallback approach regardless
           console.log("PIX API response status:", response.status, response.type);
           
-          // We'll generate the PIX code ourselves
+          // Since no-cors returns an opaque response that we can't read,
+          // we'll always use our manual code generation as a fallback
           const pixCode = createPixCode(
             'b1936613-2fa8-4307-a08d-8ddfd05b3c75',
             'iFacens',
