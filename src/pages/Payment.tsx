@@ -30,7 +30,7 @@ const Payment = () => {
   }
 
   return (
-    <div className="min-h-screen pt-16 bg-gray-50">
+    <div className="min-h-screen bg-gray-50">
       <CheckoutModal
         isOpen={showModal}
         onClose={() => navigate('/')}
