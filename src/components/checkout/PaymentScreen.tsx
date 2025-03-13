@@ -38,50 +38,48 @@ const PaymentScreen: React.FC<PaymentScreenProps> = ({ customerName }) => {
         // Format value for the API (e.g., "10.00")
         const formattedValue = formatValueForPix(totalPrice);
         
-        // Define the API URL with all parameters
-        const apiUrl = `https://gerarqrcodepix.com.br/api/v1?nome=iFacens&cidade=Sorocaba&saida=br&valor=${formattedValue}&txid=${newTxid}&chave=b1936613-2fa8-4307-a08d-8ddfd05b3c75`;
+        // Simplified API URL - only changing the value parameter
+        const apiUrl = `https://gerarqrcodepix.com.br/api/v1?nome=iFacens&cidade=Sorocaba&saida=br&valor=${formattedValue}&chave=b1936613-2fa8-4307-a08d-8ddfd05b3c75`;
         
-        console.log("Calling PIX API with URL:", apiUrl);
+        console.log("Calling simplified PIX API with URL:", apiUrl);
         
         try {
-          // Try API call with no-cors mode
+          // Try API call without the txid parameter
           const response = await fetch(apiUrl, {
             method: 'GET',
             headers: {
               'Accept': 'application/json',
             },
-            mode: 'no-cors', // This will prevent CORS errors but return an opaque response
           });
           
-          console.log("PIX API response status:", response.status, response.type);
-          
-          // Since no-cors returns an opaque response that we can't read,
-          // we'll always use our manual code generation as a fallback
-          const pixCode = createPixCode(
-            'b1936613-2fa8-4307-a08d-8ddfd05b3c75',
-            'iFacens',
-            'Sorocaba',
-            formattedValue,
-            newTxid
-          );
-          
-          setBrcode(pixCode);
+          if (response.ok) {
+            const data = await response.json();
+            console.log("PIX API response:", data);
+            
+            if (data && data.brcode) {
+              setBrcode(data.brcode);
+            } else {
+              throw new Error("API response didn't contain a valid brcode");
+            }
+          } else {
+            throw new Error(`API response not OK: ${response.status}`);
+          }
         } catch (apiError) {
           console.error("API call failed, using fallback:", apiError);
           
-          // Create PIX code manually
+          // Create PIX code manually without txid
           const pixCode = createPixCode(
             'b1936613-2fa8-4307-a08d-8ddfd05b3c75',
             'iFacens',
             'Sorocaba',
             formattedValue,
-            newTxid
+            newTxid // Still pass txid for uniqueness in the manual code
           );
           
           setBrcode(pixCode);
         }
         
-        // Salvar o pedido no Supabase
+        // Save the order to Supabase
         if (currentStandId && items.length > 0) {
           setSavingOrder(true);
           const orderItems = items.map(item => ({
@@ -104,7 +102,7 @@ const PaymentScreen: React.FC<PaymentScreenProps> = ({ customerName }) => {
             setOrderSaved(true);
           } else {
             console.error('Erro ao salvar pedido:', result.error);
-            // Não exibimos erro para o usuário neste caso, permitimos continuar com o pagamento
+            // Don't show an error to the user in this case, allow continuing with payment
           }
         }
       } catch (error) {
