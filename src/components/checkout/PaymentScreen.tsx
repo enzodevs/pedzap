@@ -1,10 +1,15 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Copy, Send, Check } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { createOrder } from '@/services/supabaseService';
-import { formatCurrency, generateTransactionId, generateWhatsAppLink, formatValueForPix, createPixCode } from '@/lib/pixUtils';
+import { 
+  formatCurrency, 
+  generateWhatsAppLink, 
+  formatValueForPix, 
+  createPixCode,
+  generateTransactionId
+} from '@/lib/pixUtils';
 import { useToast } from '@/hooks/use-toast';
 
 interface PaymentScreenProps {
@@ -24,117 +29,53 @@ const PaymentScreen: React.FC<PaymentScreenProps> = ({ customerName }) => {
 
   const [error, setError] = useState<string | null>(null);
 
-  // Generate PIX code when component mounts
+  // Generate PIX code and transaction ID when component mounts
   useEffect(() => {
     const generatePix = async () => {
-      // Reset error state
       setError(null);
-      
+      setLoading(true);
+
       try {
-        // Generate transaction ID once
-        const newTxid = generateTransactionId();
-        setTxid(newTxid);
-        
-        // Format value for the API (e.g., "10.00")
         const formattedValue = formatValueForPix(totalPrice);
-        
-        // Simplified API URL - only changing the value parameter
-        const apiUrl = `https://gerarqrcodepix.com.br/api/v1?nome=iFacens&cidade=Sorocaba&saida=br&valor=${formattedValue}&chave=b1936613-2fa8-4307-a08d-8ddfd05b3c75`;
-        
-        console.log("Calling simplified PIX API with URL:", apiUrl);
-        
-        try {
-          // Try API call without the txid parameter
-          const response = await fetch(apiUrl, {
-            method: 'GET',
-            headers: {
-              'Accept': 'application/json',
-            },
-          });
-          
-          if (response.ok) {
-            const data = await response.json();
-            console.log("PIX API response:", data);
-            
-            if (data && data.brcode) {
-              setBrcode(data.brcode);
-            } else {
-              throw new Error("API response didn't contain a valid brcode");
-            }
-          } else {
-            throw new Error(`API response not OK: ${response.status}`);
-          }
-        } catch (apiError) {
-          console.error("API call failed, using fallback:", apiError);
-          
-          // Create PIX code manually without txid
-          const pixCode = createPixCode(
-            'b1936613-2fa8-4307-a08d-8ddfd05b3c75',
-            'iFacens',
-            'Sorocaba',
-            formattedValue,
-            newTxid // Still pass txid for uniqueness in the manual code
-          );
-          
-          setBrcode(pixCode);
-        }
-        
-        // Save the order to Supabase
-        if (currentStandId && items.length > 0) {
-          setSavingOrder(true);
-          const orderItems = items.map(item => ({
-            productId: item.product.id,
-            quantity: item.quantity,
-            unitPrice: item.product.price
-          }));
-          
-          const result = await createOrder(
-            customerName,
-            newTxid,
-            currentStandId,
-            orderItems,
-            totalPrice
-          );
-          
-          setSavingOrder(false);
-          
-          if (result.success) {
-            setOrderSaved(true);
-          } else {
-            console.error('Erro ao salvar pedido:', result.error);
-            // Don't show an error to the user in this case, allow continuing with payment
-          }
-        }
+
+        const pixCode = createPixCode(
+          'b1936613-2fa8-4307-a08d-8ddfd05b3c75', // Chave PIX fixa
+          'iFacens',                              // Nome do comerciante fixo
+          'Sorocaba',                             // Cidade fixa
+          formattedValue                          // Valor dinâmico
+        );
+
+        // Generate a transaction ID to include in the WhatsApp message
+        const transactionId = generateTransactionId();
+
+        setBrcode(pixCode);
+        setTxid(transactionId);
+        console.log('Código PIX gerado:', pixCode, 'TXID:', transactionId);
       } catch (error) {
-        console.error('Error generating PIX code:', error);
-        setError('Houve um erro ao gerar o código PIX. Por favor, tente novamente.');
+        console.error('Erro ao gerar código PIX:', error);
+        setError('Erro ao gerar o código PIX. Tente novamente.');
       } finally {
         setLoading(false);
       }
     };
 
-    // Only generate PIX if we have items and a positive total price
-    if (items.length > 0 && totalPrice > 0 && currentStandId) {
-      generatePix();
-    } else {
-      setError('Seu carrinho está vazio ou há um problema com o valor total.');
-      setLoading(false);
-    }
-  }, [items, totalPrice, currentStandId, customerName]);
+    generatePix();
+  }, [totalPrice]);
 
   // Generate WhatsApp link with order information
-  const whatsappLink = items.length > 0 && txid 
-    ? generateWhatsAppLink(
-        customerName,
-        items.map(item => ({
-          name: item.product.name,
-          quantity: item.quantity,
-          price: item.product.price
-        })),
-        totalPrice,
-        txid
-      )
-    : '';
+  const whatsappLink =
+    items.length > 0 && txid
+      ? generateWhatsAppLink(
+          customerName,
+          items.map(item => ({
+            name: item.product.name,
+            quantity: item.quantity,
+            price: item.product.price
+          })),
+          totalPrice,
+          txid
+        )
+      : '';
 
   const copyPixCode = () => {
     if (brcode) {

@@ -1,3 +1,4 @@
+import { createStaticPix, hasError } from 'pix-utils';
 
 /**
  * Generates a random transaction ID for PIX payments
@@ -31,27 +32,31 @@ export const formatValueForPix = (value: number): string => {
 };
 
 /**
- * Manually creates a PIX code without using the API
- * Using a simplified structure compatible with most PIX apps
- * 
- * @param pixKey The PIX key
- * @param merchant The merchant name
- * @param city The merchant city
- * @param amount The transaction amount
- * @param txid The transaction ID (optional)
- * @returns A formatted PIX code string
+ * Cria um código PIX simplificado com os parâmetros essenciais.
+ * @param pixKey Chave PIX
+ * @param merchantName Nome do comerciante
+ * @param merchantCity Cidade do comerciante
+ * @param amount Valor da transação como string (ex.: "10.50")
+ * @returns O código PIX (BR Code)
  */
 export const createPixCode = (
   pixKey: string,
-  merchant: string,
-  city: string,
-  amount: string,
-  txid?: string
+  merchantName: string,
+  merchantCity: string,
+  amount: string
 ): string => {
-  // This is a simplified version that should work with most PIX apps
-  // If txid is not provided, we'll just exclude that part
-  const txidPart = txid ? `6215051${txid}` : '';
-  return `00020126580014br.gov.bcb.pix0136${pixKey}5204000053039865405${amount}5802BR5907${merchant}6008${city}${txidPart}6304`;
+  const pix = createStaticPix({
+    pixKey: pixKey,
+    merchantName: merchantName,
+    merchantCity: merchantCity,
+    transactionAmount: parseFloat(amount),
+  });
+
+  if (hasError(pix)) {
+    throw new Error('Erro ao gerar código PIX: ' + JSON.stringify(pix.error));
+  }
+
+  return pix.toBRCode();
 };
 
 /**
