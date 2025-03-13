@@ -42,9 +42,11 @@ const Header = () => {
           className="relative flex items-center"
           onClick={closeMenu}
         >
-          <span className="text-2xl font-bold text-ifacens-primary">
-            iFacens
-          </span>
+          <img
+            src="/logo.png"
+            alt="IFACENS"
+            className="h-10 w-auto"
+          />
         </Link>
 
         {/* Desktop Navigation */}
