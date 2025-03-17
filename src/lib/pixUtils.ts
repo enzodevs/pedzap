@@ -113,5 +113,5 @@ export const generateWhatsAppLink = (
 
   // Encode for URL and return with WhatsApp API link
   // This number is just a placeholder - replace with the actual number
-  return `https://wa.me/5515999999999?text=${encodeURIComponent(message)}`;
+  return `https://wa.me/5515981060499?text=${encodeURIComponent(message)}`;
 };
