@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Copy, Send, Check, Loader2 } from 'lucide-react';
@@ -172,10 +171,7 @@ const PaymentScreen: React.FC<PaymentScreenProps> = ({ customerName }) => {
                       
                       <div className="flex justify-center mb-4">
                         <div className="bg-white rounded-full p-3 shadow-md">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 256 256">
-                            <path fill="#32BCAD" d="M128 24.186L19.467 85.33v85.332L128 231.813l108.533-61.14V85.33z"/>
-                            <path fill="#fff" d="M110.483 99.202a3.327 3.327 0 0 0-3.31 3.33v15.676H91.497a3.325 3.325 0 0 0-3.31 3.326a3.324 3.324 0 0 0 3.31 3.33h15.676v15.673a3.33 3.33 0 0 0 3.31 3.33a3.332 3.332 0 0 0 3.33-3.33v-15.673h15.673a3.33 3.33 0 0 0 0-6.657h-15.673v-15.676a3.329 3.329 0 0 0-3.33-3.329ZM71.55 99.169a2.996 2.996 0 0 0-2.996 2.996V137.7c0 .783.335 1.566.9 2.132l21.212 21.213a3.001 3.001 0 0 0 4.229-4.229l-20.346-20.347v-34.304a2.998 2.998 0 0 0-2.998-2.996ZM187.43 99.202c-.786 0-1.566.332-2.131.9l-21.213 21.212a3.001 3.001 0 0 0 4.229 4.229l20.347-20.346v34.304a2.998 2.998 0 0 0 5.996 0v-35.535c0-.783-.332-1.566-.9-2.131a2.991 2.991 0 0 0-2.131-.9c-.2 0-.398 0-.597.066-.066 0-.133.067-.2.067-.133.066-.266.133-.4.133Z"/>
-                          </svg>
+                          <img src="https://logospng.org/download/pix/logo-pix-icone-512.png" alt="Ícone Pix" width="48" height="48" />
                         </div>
                       </div>
                       
