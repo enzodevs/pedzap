@@ -104,12 +104,12 @@ export const generateWhatsAppLink = (
     .join('\n\n');
 
   // Format complete message with better structure and emojis
-  const message = `*📱 NOVO PEDIDO IFACENS!*\n\n` +
-    `👤 *Cliente:* ${name}\n` +
-    `🆔 *ID da Transação:* ${transactionId}\n\n` +
-    `🛒 *ITENS DO PEDIDO:*\n${itemsText}\n\n` +
-    `💰 *Total:* ${formatCurrency(totalPrice)}\n\n` +
-    `✅ Estou enviando o comprovante do PIX.`;
+  const message = `*NOVO PEDIDO IFACENS!*\n\n` +
+    `*Cliente:* ${name}\n` +
+    `*ID da Transação:* ${transactionId}\n\n` +
+    `*ITENS DO PEDIDO:*\n${itemsText}\n\n` +
+    `*Total:* ${formatCurrency(totalPrice)}\n\n` +
+    `Estou enviando o comprovante do PIX.`;
 
   // Encode for URL and return with WhatsApp API link
   // This number is just a placeholder - replace with the actual number
