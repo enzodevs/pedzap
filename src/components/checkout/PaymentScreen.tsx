@@ -73,7 +73,8 @@ const PaymentScreen: React.FC<PaymentScreenProps> = ({ customerName }) => {
           items.map(item => ({
             name: item.product.name,
             quantity: item.quantity,
-            price: item.product.price
+            price: item.product.price,
+            description: item.product.description // Include description with customizations
           })),
           totalPrice,
           txid
@@ -100,7 +101,7 @@ const PaymentScreen: React.FC<PaymentScreenProps> = ({ customerName }) => {
   return (
     <>
       <Header />
-      <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white pt-24 pb-12">
+      <div className="min-h-screen bg-white pt-24 pb-12">
         <div className="container mx-auto px-4 max-w-xl">
           <button
             onClick={() => navigate('/payment')}
@@ -110,14 +111,14 @@ const PaymentScreen: React.FC<PaymentScreenProps> = ({ customerName }) => {
             Voltar
           </button>
           
-          <Card className="border-t-4 border-t-ifacens-primary shadow-lg">
-            <CardHeader className="pb-2">
+          <Card className="border-t-4 border-t-ifacens-primary shadow-lg overflow-hidden">
+            <CardHeader className="pb-2 bg-white">
               <CardTitle className="text-2xl font-bold text-center text-ifacens-primary">
                 Pagamento via PIX
               </CardTitle>
             </CardHeader>
             
-            <CardContent className="pt-4">
+            <CardContent className="pt-4 bg-gradient-to-b from-blue-50 to-white">
               {loading || savingOrder ? (
                 <div className="text-center py-12">
                   <Loader2 className="h-12 w-12 animate-spin text-ifacens-primary mx-auto mb-4" />
@@ -140,19 +141,19 @@ const PaymentScreen: React.FC<PaymentScreenProps> = ({ customerName }) => {
               ) : (
                 <>
                   <div className="mb-6">
-                    <div className="bg-blue-50 p-5 rounded-lg border border-blue-100">
+                    <div className="bg-white p-5 rounded-lg border border-blue-100 shadow-sm">
                       <h2 className="font-bold text-ifacens-primary mb-3 flex items-center">
                         <div className="bg-ifacens-primary text-white rounded-full w-6 h-6 flex items-center justify-center text-xs mr-2">1</div>
                         Resumo do Pedido
                       </h2>
                       <div className="space-y-2">
                         <p className="text-gray-700 mb-1 flex justify-between">
-                          <span>Nome:</span> 
-                          <span className="font-medium">{customerName}</span>
+                          <span className="font-medium">Nome:</span> 
+                          <span>{customerName}</span>
                         </p>
-                        <p className="text-gray-700 mb-1 flex justify-between">
-                          <span>ID da Transação:</span> 
-                          <span className="font-medium text-xs">{txid}</span>
+                        <p className="text-gray-700 mb-1 flex flex-col sm:flex-row sm:justify-between">
+                          <span className="font-medium">ID da Transação:</span> 
+                          <code className="font-mono text-xs bg-gray-100 p-1 px-2 rounded mt-1 sm:mt-0 overflow-auto max-w-full sm:max-w-[200px] block sm:inline-block whitespace-nowrap">{txid}</code>
                         </p>
                         <p className="text-gray-700 flex justify-between font-bold text-lg pt-2 border-t border-blue-100 mt-2">
                           <span>Total:</span> 
@@ -163,7 +164,7 @@ const PaymentScreen: React.FC<PaymentScreenProps> = ({ customerName }) => {
                   </div>
                   
                   <div className="mb-6">
-                    <div className="bg-blue-50 p-5 rounded-lg border border-blue-100">
+                    <div className="bg-white p-5 rounded-lg border border-blue-100 shadow-sm">
                       <h2 className="font-bold text-ifacens-primary mb-3 flex items-center">
                         <div className="bg-ifacens-primary text-white rounded-full w-6 h-6 flex items-center justify-center text-xs mr-2">2</div>
                         Código PIX
@@ -177,9 +178,18 @@ const PaymentScreen: React.FC<PaymentScreenProps> = ({ customerName }) => {
                       
                       {brcode && (
                         <>
-                          <p className="text-sm break-all mb-3 bg-white p-3 rounded-lg border border-gray-200 font-mono shadow-sm">
-                            {brcode}
-                          </p>
+                          <div className="relative mb-3 group cursor-pointer" onClick={copyPixCode}>
+                            <div className="bg-white p-3 rounded-lg border border-gray-200 shadow-sm overflow-hidden">
+                              <p className="text-sm break-all font-mono blur-sm group-hover:blur-none transition-all duration-300">
+                                {brcode}
+                              </p>
+                            </div>
+                            <div className="absolute inset-0 flex items-center justify-center group-hover:opacity-0 transition-opacity">
+                              <div className="bg-white/90 px-4 py-2 rounded-full text-sm font-medium text-ifacens-primary border border-ifacens-primary/20 shadow-sm">
+                                Clique para revelar o código
+                              </div>
+                            </div>
+                          </div>
                           <Button
                             onClick={copyPixCode}
                             className="w-full bg-white border border-ifacens-primary text-ifacens-primary hover:bg-ifacens-primary/5 transition-colors flex items-center justify-center"
@@ -203,7 +213,7 @@ const PaymentScreen: React.FC<PaymentScreenProps> = ({ customerName }) => {
                   </div>
                   
                   <div className="mb-8">
-                    <div className="bg-blue-50 p-5 rounded-lg border border-blue-100">
+                    <div className="bg-white p-5 rounded-lg border border-blue-100 shadow-sm">
                       <h2 className="font-bold text-ifacens-primary mb-3 flex items-center">
                         <div className="bg-ifacens-primary text-white rounded-full w-6 h-6 flex items-center justify-center text-xs mr-2">3</div>
                         Instruções

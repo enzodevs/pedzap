@@ -8,6 +8,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { useCart, Product } from '@/context/CartContext';
 import { formatCurrency } from '@/lib/pixUtils';
 import Header from '@/components/layout/Header';
+import { toast } from '@/hooks/use-toast';
 
 const ProductDetails = () => {
   const { id } = useParams<{ id: string }>();
@@ -123,6 +124,12 @@ const ProductDetails = () => {
     
     // Adicionar ao carrinho
     addItem(customProduct, quantity);
+    
+    // Mostrar notificação ao invés de abrir o carrinho
+    toast({
+      title: "Item adicionado à sacola!",
+      description: `${quantity}x ${product.name} foi adicionado à sua sacola.`,
+    });
     
     // Voltar para a página inicial
     navigate('/');

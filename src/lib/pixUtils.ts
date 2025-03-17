@@ -69,22 +69,47 @@ export const createPixCode = (
  */
 export const generateWhatsAppLink = (
   name: string,
-  orderItems: Array<{ name: string; quantity: number; price: number }>,
+  orderItems: Array<{ 
+    name: string; 
+    quantity: number; 
+    price: number; 
+    description?: string 
+  }>,
   totalPrice: number,
   transactionId: string
 ): string => {
-  // Format items text
+  // Format items text with descriptions/customizations
   const itemsText = orderItems
-    .map(item => `• ${item.quantity}x ${item.name} - ${formatCurrency(item.price * item.quantity)}`)
-    .join('\n');
+    .map(item => {
+      // Base item text
+      const baseText = `• ${item.quantity}x ${item.name} - ${formatCurrency(item.price * item.quantity)}`;
+      
+      // Check if description has customization info (in parentheses)
+      if (item.description && item.description.includes('(')) {
+        const customizationStart = item.description.indexOf('(') + 1;
+        const customizationEnd = item.description.indexOf(')');
+        
+        if (customizationStart > 0 && customizationEnd > customizationStart) {
+          const customizationText = item.description.substring(
+            customizationStart, 
+            customizationEnd
+          );
+          
+          return `${baseText}\n   ↳ _${customizationText}_`;
+        }
+      }
+      
+      return baseText;
+    })
+    .join('\n\n');
 
-  // Format complete message
-  const message = `*Novo pedido iFacens!*\n\n` +
-    `*Nome:* ${name}\n` +
-    `*ID da Transação:* ${transactionId}\n\n` +
-    `*Itens do Pedido:*\n${itemsText}\n\n` +
-    `*Total:* ${formatCurrency(totalPrice)}\n\n` +
-    `Estou enviando o comprovante do PIX.`;
+  // Format complete message with better structure and emojis
+  const message = `*📱 NOVO PEDIDO IFACENS!*\n\n` +
+    `👤 *Cliente:* ${name}\n` +
+    `🆔 *ID da Transação:* ${transactionId}\n\n` +
+    `🛒 *ITENS DO PEDIDO:*\n${itemsText}\n\n` +
+    `💰 *Total:* ${formatCurrency(totalPrice)}\n\n` +
+    `✅ Estou enviando o comprovante do PIX.`;
 
   // Encode for URL and return with WhatsApp API link
   // This number is just a placeholder - replace with the actual number

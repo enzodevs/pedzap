@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { ShoppingBag } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
@@ -10,14 +9,14 @@ const FloatingCartButton = () => {
   if (totalItems === 0) return null;
 
   return (
-    <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-30">
+    <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-30">
       <button
         onClick={toggleCart}
-        className="bg-ifacens-primary text-white py-2 px-4 rounded-full shadow-lg flex items-center space-x-2 hover:bg-ifacens-primary/90 transition-all"
+        className="bg-ifacens-primary text-white py-3 px-5 rounded-full shadow-lg flex items-center space-x-3 hover:bg-ifacens-primary/90 transition-all"
       >
         <div className="relative">
-          <ShoppingBag className="h-5 w-5" />
-          <span className="absolute -top-2 -right-2 bg-white text-ifacens-primary text-xs font-bold rounded-full w-4 h-4 flex items-center justify-center">
+          <ShoppingBag className="h-6 w-6" />
+          <span className="absolute -top-2 -right-2 bg-white text-ifacens-primary text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
             {totalItems}
           </span>
         </div>

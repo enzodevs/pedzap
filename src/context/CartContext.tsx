@@ -142,7 +142,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
 
     // Abrir carrinho ao adicionar itens
-    setIsCartOpen(true);
+
   };
 
   // Remove item from cart

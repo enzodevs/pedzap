@@ -1,16 +1,16 @@
-
 import React, { useState } from 'react';
 import { Plus, Minus, ShoppingBag, AlertCircle } from 'lucide-react';
 import { useCart, Product } from '@/context/CartContext';
 import { formatCurrency } from '@/lib/pixUtils';
 import { useNavigate } from 'react-router-dom';
+import { toast } from '@/hooks/use-toast';
 
 interface ProductCardProps {
   product: Product;
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
-  const { addItem, toggleCart } = useCart();
+  const { addItem } = useCart();
   const [quantity, setQuantity] = useState(1);
   const navigate = useNavigate();
 
@@ -43,8 +43,14 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     }
     
     addItem(product, quantity);
+    
+    // Mostrar notificação ao invés de abrir o carrinho
+    toast({
+      title: "Item adicionado à sacola!",
+      description: `${quantity}x ${product.name} foi adicionado à sua sacola.`
+    });
+    
     setQuantity(1);
-    toggleCart(); // Abrir o carrinho automaticamente após adicionar produto
   };
 
   // Use a default image if none is provided
