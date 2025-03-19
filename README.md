@@ -1,10 +1,10 @@
-# iFacens
+# PedZap
 
-![iFacens Logo](https://amethyst-fantastic-halibut-830.mypinata.cloud/ipfs/bafkreigjrfpotoaghn74hqbrgo355arqtfr7zcr6ily27g2tanqsiumahm)
+![iFacens Logo](https://amethyst-fantastic-halibut-830.mypinata.cloud/ipfs/bafkreic2ax7qlgewkhjswtuczifd2dy4xlsm7scukw35rge6ybiozpt6e4)
 
 ## Bem-vindo(a)!
 
-O iFacens é a solução perfeita para otimizar seu tempo e evitar filas! Explore os cardápios das barracas da Facens, faça seus pedidos com antecedência e aproveite ao máximo cada minuto do seu intervalo.
+O PedZap é a solução perfeita para otimizar seu tempo e evitar filas! Explore os cardápios das barracas da Facens, faça seus pedidos com antecedência e aproveite ao máximo cada minuto do seu intervalo.
 
 ## Descrição
 

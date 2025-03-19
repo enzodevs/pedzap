@@ -1,4 +1,3 @@
-import React from 'react';
 import { ArrowDown } from 'lucide-react';
 
 const Hero = () => {
@@ -14,7 +13,7 @@ const Hero = () => {
       <div className="container mx-auto px-4 text-center">
         <div className="max-w-3xl mx-auto">
           <span className="inline-block px-4 py-1 rounded-full bg-ifacens-primary/10 text-ifacens-primary font-medium text-sm mb-6 animate-fade-in">
-            Cardápio iFacens
+            Cardápio PedZap
           </span>
           
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight animate-fade-in">

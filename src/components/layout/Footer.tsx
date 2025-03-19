@@ -9,7 +9,7 @@ const Footer = () => {
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>
-            <h3 className="text-xl font-bold mb-4">iFacens</h3>
+            <h3 className="text-xl font-bold mb-4">PedZap</h3>
             <p className="text-gray-300">
               Seu cardápio digital para as barracas da faculdade.
             </p>
@@ -34,16 +34,16 @@ const Footer = () => {
           <div>
             <h3 className="text-xl font-bold mb-4">Contato</h3>
             <p className="text-gray-300">
-              Faculdade de Engenharia de Sorocaba<br />
+              PedZap<br />
               Sorocaba, SP<br />
-              contato@ifacens.com.br
+              contato@pedzap.com.br
             </p>
           </div>
         </div>
         
         <div className="border-t border-gray-700 mt-8 pt-8 text-center">
           <p className="text-gray-400">
-            &copy; {currentYear} iFacens. Todos os direitos reservados.
+            &copy; {currentYear} PedZap. Todos os direitos reservados.
           </p>
         </div>
       </div>

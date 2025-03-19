@@ -41,7 +41,7 @@ const Header = () => {
         >
           <img
             src="/logo.png"
-            alt="IFACENS"
+            alt="PEDZAP LOGO"
             className="h-10 w-auto"
           />
         </Link>
