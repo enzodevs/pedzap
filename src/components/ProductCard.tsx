@@ -53,7 +53,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     setQuantity(1);
   };
 
-  // Use a default image if none is provided
+  // Imagem default
   const imageUrl = product.image || '/placeholder.svg';
   
   const outOfStock = product.stock !== undefined && product.stock <= 0;

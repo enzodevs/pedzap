@@ -1,4 +1,3 @@
-import React from 'react';
 import { ShoppingBag } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { formatCurrency } from '@/lib/pixUtils';

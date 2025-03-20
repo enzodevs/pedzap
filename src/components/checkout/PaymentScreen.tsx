@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Copy, Send, Check, Loader2 } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
-import { createOrder } from '@/services/supabaseService';
 import { 
   formatCurrency, 
   generateWhatsAppLink, 
@@ -23,10 +22,9 @@ const PaymentScreen: React.FC<PaymentScreenProps> = ({ customerName }) => {
   const [brcode, setBrcode] = useState<string | null>(null);
   const [txid, setTxid] = useState<string>('');
   const [loading, setLoading] = useState(true);
-  const [savingOrder, setSavingOrder] = useState(false);
+  const [savingOrder] = useState(false);
   const [copied, setCopied] = useState(false);
-  const [orderSaved, setOrderSaved] = useState(false);
-  const { items, totalPrice, currentStandId, clearCart } = useCart();
+  const { items, totalPrice, clearCart } = useCart();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -42,10 +40,10 @@ const PaymentScreen: React.FC<PaymentScreenProps> = ({ customerName }) => {
         const formattedValue = formatValueForPix(totalPrice);
 
         const pixCode = createPixCode(
-          'b1936613-2fa8-4307-a08d-8ddfd05b3c75', // Chave PIX fixa
-          'iFacens',                              // Nome do comerciante fixo
-          'Sorocaba',                             // Cidade fixa
-          formattedValue                          // Valor dinâmico
+          'b1936613-2fa8-4307-a08d-8ddfd05b3c75', // Pix
+          'PedZap',
+          'Sorocaba',
+          formattedValue
         );
 
         // Generate a transaction ID to include in the WhatsApp message
@@ -74,7 +72,7 @@ const PaymentScreen: React.FC<PaymentScreenProps> = ({ customerName }) => {
             name: item.product.name,
             quantity: item.quantity,
             price: item.product.price,
-            description: item.product.description // Include description with customizations
+            description: item.product.description
           })),
           totalPrice,
           txid

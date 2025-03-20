@@ -7,7 +7,7 @@ import { createStaticPix, hasError } from 'pix-utils';
 export const generateTransactionId = (): string => {
   const randomPart = Math.random().toString(36).substring(2, 10);
   const timestamp = Date.now().toString(36);
-  return `ifacens-${randomPart}-${timestamp}`;
+  return `pedzap-${randomPart}-${timestamp}`;
 };
 
 /**
@@ -104,7 +104,7 @@ export const generateWhatsAppLink = (
     .join('\n\n');
 
   // Format complete message with better structure and emojis
-  const message = `*NOVO PEDIDO IFACENS!*\n\n` +
+  const message = `*NOVO PEDIDO PedZap!*\n\n` +
     `*Cliente:* ${name}\n` +
     `*ID da Transação:* ${transactionId}\n\n` +
     `*ITENS DO PEDIDO:*\n${itemsText}\n\n` +
